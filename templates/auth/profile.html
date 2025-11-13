@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar Profile Info -->
+        <div class="col-md-4">
+            <div class="card profile-card">
+                <div class="card-body text-center">
+                    <div class="profile-picture-container mb-3">
+                        {% if current_user.profile_picture %}
+                            <img src="{{ current_user.profile_picture }}" alt="Profile Picture" class="profile-pic">
+                        {% else %}
+                            <div class="profile-pic-default">
+                                <i class="fas fa-user fa-4x text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h4 class="profile-username">{{ current_user.username }}</h4>
+                    <p class="text-muted profile-profession">{{ current_user.profession }}</p>
+                    
+                    <div class="profile-badges mb-3">
+                        <span class="badge badge-expertise bg-{{ 'success' if current_user.expertise_level == 'expert' else 'warning' if current_user.expertise_level == 'intermediate' else 'info' }}">
+                            {{ current_user.expertise_level|title }}
+                        </span>
+                        {% if current_user.is_consultant %}
+                        <span class="badge bg-primary">Consultant</span>
+                        {% endif %}
+                        {% if current_user.is_admin %}
+                        <span class="badge bg-danger">Admin</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-number">{{ current_user.blog_posts|length }}</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number">{{ current_user.forum_threads|length }}</div>
+                                <div class="stat-label">Threads</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-number">{{ current_user.products|length }}</div>
+                                <div class="stat-label">Products</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('create_blog_post') }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-edit"></i> Write Blog Post
+                        </a>
+                        <a href="{{ url_for('create_product') }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-plus"></i> Add Product
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-user-tie"></i> Become Consultant
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-8">
+            <!-- Profile Edit Form -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-edit"></i> Edit Profile</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('update_profile') }}" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" value="{{ current_user.username }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="profession" class="form-label">Profession</label>
+                                <select class="form-select" id="profession" name="profession" required>
+                                    <option value="Farmer" {% if current_user.profession == 'Farmer' %}selected{% endif %}>Farmer</option>
+                                    <option value="Agriculturist" {% if current_user.profession == 'Agriculturist' %}selected{% endif %}>Agriculturist</option>
+                                    <option value="Researcher" {% if current_user.profession == 'Researcher' %}selected{% endif %}>Researcher</option>
+                                    <option value="Student" {% if current_user.profession == 'Student' %}selected{% endif %}>Student</option>
+                                    <option value="Consultant" {% if current_user.profession == 'Consultant' %}selected{% endif %}>Consultant</option>
+                                    <option value="Other" {% if current_user.profession == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="expertise_level" class="form-label">Expertise Level</label>
+                                <select class="form-select" id="expertise_level" name="expertise_level" required>
+                                    <option value="beginner" {% if current_user.expertise_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                                    <option value="intermediate" {% if current_user.expertise_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                                    <option value="expert" {% if current_user.expertise_level == 'expert' %}selected{% endif %}>Expert</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="profile_picture" class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3" placeholder="Tell us about yourself and your farming experience..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change Password -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-key"></i> Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('change_password') }}">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_new_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_new_password" name="confirm_new_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Change Password</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- User Activity -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        {% if current_user.blog_posts %}
+                            <div class="activity-item">
+                                <div class="activity-icon bg-success">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h6>Latest Blog Post</h6>
+                                    <p class="mb-1">{{ current_user.blog_posts[-1].title }}</p>
+                                    <small class="text-muted">{{ current_user.blog_posts[-1].created_at|time_ago }}</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if current_user.forum_threads %}
+                            <div class="activity-item">
+                                <div class="activity-icon bg-info">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h6>Latest Forum Thread</h6>
+                                    <p class="mb-1">{{ current_user.forum_threads[-1].title }}</p>
+                                    <small class="text-muted">{{ current_user.forum_threads[-1].created_at|time_ago }}</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if current_user.products %}
+                            <div class="activity-item">
+                                <div class="activity-icon bg-warning">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h6>Latest Product</h6>
+                                    <p class="mb-1">{{ current_user.products[-1].name }}</p>
+                                    <small class="text-muted">{{ current_user.products[-1].created_at|time_ago }}</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if not current_user.blog_posts and not current_user.forum_threads and not current_user.products %}
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p>No activity yet. Start by creating your first blog post or product!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

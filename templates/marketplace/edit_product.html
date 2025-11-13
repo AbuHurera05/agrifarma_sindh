@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit"></i> Edit Product</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Product Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ product.name }}" required>
+                                    <div class="form-text">Make it clear and descriptive</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Crops" {% if product.category == 'Crops' %}selected{% endif %}>Crops</option>
+                                        <option value="Seeds" {% if product.category == 'Seeds' %}selected{% endif %}>Seeds</option>
+                                        <option value="Fertilizers" {% if product.category == 'Fertilizers' %}selected{% endif %}>Fertilizers</option>
+                                        <option value="Tools" {% if product.category == 'Tools' %}selected{% endif %}>Tools</option>
+                                        <option value="Livestock" {% if product.category == 'Livestock' %}selected{% endif %}>Livestock</option>
+                                        <option value="Organic Products" {% if product.category == 'Organic Products' %}selected{% endif %}>Organic Products</option>
+                                        <option value="Dairy Products" {% if product.category == 'Dairy Products' %}selected{% endif %}>Dairy Products</option>
+                                        <option value="Poultry" {% if product.category == 'Poultry' %}selected{% endif %}>Poultry</option>
+                                        <option value="Farm Equipment" {% if product.category == 'Farm Equipment' %}selected{% endif %}>Farm Equipment</option>
+                                        <option value="Irrigation Systems" {% if product.category == 'Irrigation Systems' %}selected{% endif %}>Irrigation Systems</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Product Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" 
+                                      required>{{ product.description }}</textarea>
+                            <div class="form-text">Be detailed about your product's features and quality</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price (Rs.)</label>
+                                    <input type="number" class="form-control" id="price" name="price" 
+                                           step="0.01" min="0" value="{{ "%.2f"|format(product.price) }}" required>
+                                    <div class="form-text">Set a competitive price</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                                    <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" 
+                                           min="0" value="{{ product.stock_quantity }}" required>
+                                    <div class="form-text">Set to 0 if out of stock</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Image -->
+                        {% if product.image_url %}
+                        <div class="mb-3">
+                            <label class="form-label">Current Image</label>
+                            <div class="current-image-container">
+                                <img src="{{ product.image_url }}" class="current-product-image" alt="{{ product.name }}">
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="remove_image" name="remove_image" value="1">
+                                    <label class="form-check-label text-danger" for="remove_image">
+                                        Remove current image
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="product_image" class="form-label">
+                                {% if product.image_url %}Change Product Image{% else %}Product Image{% endif %}
+                            </label>
+                            <input type="file" class="form-control" id="product_image" name="product_image" 
+                                   accept="image/*">
+                            <div class="form-text">
+                                Upload a clear image of your product (optional). 
+                                Supported formats: JPG, PNG, GIF. Max size: 5MB
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Product Information</h6>
+                            <ul class="mb-0">
+                                <li>Created: {{ product.created_at.strftime('%Y-%m-%d %H:%M') }}</li>
+                                <li>Last Updated: {{ product.updated_at.strftime('%Y-%m-%d %H:%M') if product.updated_at else 'Never' }}</li>
+                                <li>Status: {% if product.approved %}Approved{% else %}Pending Approval{% endif %}</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Update Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card mt-4 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Delete Product</h6>
+                    <p class="text-muted">Once you delete a product, there is no going back. Please be certain.</p>
+                    <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" 
+                          onsubmit="return confirm('Are you sure you want to delete this product? This action cannot be undone.');">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete This Product
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Price validation
+    const priceInput = document.getElementById('price');
+    if (priceInput) {
+        priceInput.addEventListener('change', function() {
+            if (this.value < 0) {
+                this.value = 0;
+            }
+        });
+    }
+
+    // Stock quantity validation
+    const stockInput = document.getElementById('stock_quantity');
+    if (stockInput) {
+        stockInput.addEventListener('change', function() {
+            if (this.value < 0) {
+                this.value = 0;
+            }
+        });
+    }
+
+    // Image preview functionality
+    const imageInput = document.getElementById('product_image');
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    this.value = '';
+                    return;
+                }
+                
+                // Check file type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a valid image file (JPG, PNG, GIF)');
+                    this.value = '';
+                    return;
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

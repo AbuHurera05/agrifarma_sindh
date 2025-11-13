@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('consultants') }}">Consultants</a></li>
+            <li class="breadcrumb-item active">{{ consultant.user.username }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Consultant Profile -->
+        <div class="col-lg-8">
+            <div class="consultant-profile-card card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="consultant-profile-avatar mb-4">
+                                {% if consultant.user.profile_picture %}
+                                <img src="{{ consultant.user.profile_picture }}" alt="{{ consultant.user.username }}" 
+                                     class="consultant-profile-img rounded-circle">
+                                {% else %}
+                                <div class="consultant-profile-default rounded-circle">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="consultant-profile-stats">
+                                <div class="stat-item mb-3">
+                                    <div class="stat-number">{{ consultant.experience }}+</div>
+                                    <div class="stat-label">Years Experience</div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="stat-number">4.5</div>
+                                    <div class="stat-label">Rating</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">150+</div>
+                                    <div class="stat-label">Farmers Helped</div>
+                                </div>
+                            </div>
+
+                            <div class="consultant-verification mt-4">
+                                <div class="verified-badge">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <span>Verified Consultant</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="consultant-profile-header mb-4">
+                                <h1 class="consultant-profile-name">{{ consultant.user.username }}</h1>
+                                <p class="consultant-profile-title text-success">
+                                    <i class="fas fa-graduation-cap"></i> {{ consultant.specialization }}
+                                </p>
+                                <p class="consultant-profile-location">
+                                    <i class="fas fa-map-marker-alt"></i> {{ consultant.user.location }}
+                                </p>
+                                
+                                <div class="consultant-rating-display mb-3">
+                                    <div class="stars-large">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    </div>
+                                    <span class="rating-text">4.5 (128 reviews)</span>
+                                </div>
+
+                                <div class="consultant-profile-bio">
+                                    <p>{{ consultant.bio }}</p>
+                                </div>
+                            </div>
+
+                            <div class="consultant-expertise mb-4">
+                                <h5 class="section-title">Areas of Expertise</h5>
+                                <div class="expertise-tags">
+                                    {% for skill in consultant.specialization.split(',') %}
+                                    <span class="expertise-tag">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="consultant-availability mb-4">
+                                <h5 class="section-title">Availability</h5>
+                                <div class="availability-status">
+                                    <span class="badge bg-success availability-badge">
+                                        <i class="fas fa-circle"></i> Available for Consultations
+                                    </span>
+                                </div>
+                                <div class="availability-schedule mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt"></i> Mon - Fri: 9:00 AM - 6:00 PM
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consultant Services -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> Services Offered</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="service-item">
+                                <div class="service-icon text-success">
+                                    <i class="fas fa-video"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h6>Video Consultation</h6>
+                                    <p class="text-muted mb-1">Live video calls for remote assistance</p>
+                                    <span class="service-price">Rs. {{ consultant.hourly_rate }}/hour</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="service-item">
+                                <div class="service-icon text-success">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h6>Phone Consultation</h6>
+                                    <p class="text-muted mb-1">Direct phone calls for quick advice</p>
+                                    <span class="service-price">Rs. {{ consultant.hourly_rate * 0.8 }}/hour</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="service-item">
+                                <div class="service-icon text-success">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h6>Farm Visit</h6>
+                                    <p class="text-muted mb-1">On-site inspection and guidance</p>
+                                    <span class="service-price">Rs. {{ consultant.hourly_rate * 1.5 }}/hour</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="service-item">
+                                <div class="service-icon text-success">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h6>Report Analysis</h6>
+                                    <p class="text-muted mb-1">Detailed analysis of soil/water reports</p>
+                                    <span class="service-price">Rs. {{ consultant.hourly_rate * 0.5 }}/report</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-comments"></i> Client Reviews</h5>
+    </div>
+    <div class="card-body">
+        <div class="reviews-summary mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <div class="overall-rating">
+                        <div class="rating-score">4.5</div>
+                        <div class="stars-large">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        </div>
+                        <div class="rating-count">128 reviews</div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="rating-bars">
+                        <!-- Fixed: Using static widths instead of Jinja2 in style attribute -->
+                        <div class="rating-bar-item">
+                            <span class="rating-star">5 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 80%"></div>
+                            </div>
+                            <span class="rating-count">80</span>
+                        </div>
+                        <div class="rating-bar-item">
+                            <span class="rating-star">4 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 70%"></div>
+                            </div>
+                            <span class="rating-count">70</span>
+                        </div>
+                        <div class="rating-bar-item">
+                            <span class="rating-star">3 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 60%"></div>
+                            </div>
+                            <span class="rating-count">60</span>
+                        </div>
+                        <div class="rating-bar-item">
+                            <span class="rating-star">2 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 40%"></div>
+                            </div>
+                            <span class="rating-count">40</span>
+                        </div>
+                        <div class="rating-bar-item">
+                            <span class="rating-star">1 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 20%"></div>
+                            </div>
+                            <span class="rating-count">20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reviews-list">
+            <div class="review-item mb-4">
+                <div class="review-header d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="mb-1">Ali Hassan</h6>
+                        <div class="review-stars">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">2 weeks ago</small>
+                </div>
+                <p class="review-text mb-2">
+                    Excellent consultation! {{ consultant.user.username }} helped me solve my crop disease problem within hours. Highly recommended!
+                </p>
+                <div class="review-meta">
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-check-circle text-success"></i> Video Consultation
+                    </span>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="review-item mb-4">
+                <div class="review-header d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="mb-1">Fatima Khan</h6>
+                        <div class="review-stars">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">1 month ago</small>
+                </div>
+                <p class="review-text mb-2">
+                    Great advice on soil management. My wheat yield increased by 30% after following {{ consultant.user.username }}'s recommendations.
+                </p>
+                <div class="review-meta">
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-check-circle text-success"></i> Farm Visit
+                    </span>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="review-item mb-4">
+                <div class="review-header d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="mb-1">Ahmed Raza</h6>
+                        <div class="review-stars">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">2 months ago</small>
+                </div>
+                <p class="review-text mb-2">
+                    Very knowledgeable about irrigation systems. Saved me money and improved water efficiency on my farm.
+                </p>
+                <div class="review-meta">
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-check-circle text-success"></i> Phone Consultation
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button class="btn btn-outline-success">Load More Reviews</button>
+        </div>
+    </div>
+</div>
+        </div>
+
+        <!-- Sidebar - Booking & Contact -->
+        <div class="col-lg-4">
+            <!-- Booking Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Book Consultation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="consultation-pricing text-center mb-4">
+                        <div class="pricing-header">
+                            <span class="price-amount">Rs. {{ consultant.hourly_rate }}</span>
+                            <span class="price-period">per hour</span>
+                        </div>
+                        <small class="text-muted">Flexible payment options available</small>
+                    </div>
+
+                    <form class="booking-form">
+                        <div class="mb-3">
+                            <label for="consultationType" class="form-label">Consultation Type</label>
+                            <select class="form-select" id="consultationType">
+                                <option value="video">Video Call (Rs. {{ consultant.hourly_rate }}/hour)</option>
+                                <option value="phone">Phone Call (Rs. {{ consultant.hourly_rate * 0.8 }}/hour)</option>
+                                <option value="visit">Farm Visit (Rs. {{ consultant.hourly_rate * 1.5 }}/hour)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="consultationDate" class="form-label">Preferred Date</label>
+                            <input type="date" class="form-control" id="consultationDate" min="{{ now().strftime('%Y-%m-%d') }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="consultationTime" class="form-label">Preferred Time</label>
+                            <select class="form-select" id="consultationTime">
+                                <option value="">Select Time</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="consultationDuration" class="form-label">Duration</label>
+                            <select class="form-select" id="consultationDuration">
+                                <option value="1">1 hour</option>
+                                <option value="2">2 hours</option>
+                                <option value="3">3 hours</option>
+                                <option value="4">4 hours</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="consultationNotes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="consultationNotes" rows="3" 
+                                      placeholder="Briefly describe what you need help with..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-lock"></i> Book Now - Rs. {{ consultant.hourly_rate }}
+                            </button>
+                            <button type="button" class="btn btn-outline-primary">
+                                <i class="fas fa-envelope"></i> Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-address-card"></i> Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="contact-info">
+                        <div class="contact-item mb-3">
+                            <i class="fas fa-envelope text-success me-2"></i>
+                            <span>Email: {{ consultant.user.email }}</span>
+                        </div>
+                        <div class="contact-item mb-3">
+                            <i class="fas fa-phone text-success me-2"></i>
+                            <span>Phone: +92-300-XXXXXXX</span>
+                        </div>
+                        <div class="contact-item mb-3">
+                            <i class="fas fa-map-marker-alt text-success me-2"></i>
+                            <span>Location: {{ consultant.user.location }}</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-clock text-success me-2"></i>
+                            <span>Response Time: Within 2 hours</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar Consultants -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Similar Consultants</h5>
+                </div>
+                <div class="card-body">
+                    {% for similar in consultants[:2] if similar.id != consultant.id %}
+                    <div class="similar-consultant-item mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="similar-consultant-avatar me-3">
+                                {% if similar.user.profile_picture %}
+                                <img src="{{ similar.user.profile_picture }}" alt="{{ similar.user.username }}" 
+                                     class="similar-consultant-img rounded-circle">
+                                {% else %}
+                                <div class="similar-consultant-default rounded-circle">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="similar-consultant-info flex-grow-1">
+                                <h6 class="mb-1">{{ similar.user.username }}</h6>
+                                <p class="text-muted mb-1 small">{{ similar.specialization }}</p>
+                                <div class="similar-consultant-rating">
+                                    <small class="text-warning">
+                                        <i class="fas fa-star"></i> 4.3
+                                    </small>
+                                    <small class="text-muted ms-2">Rs. {{ similar.hourly_rate }}/hr</small>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('consultant_detail', consultant_id=similar.id) }}" 
+                           class="btn btn-outline-success btn-sm w-100 mt-2">View Profile</a>
+                    </div>
+                    {% if not loop.last %}
+                    <hr class="my-2">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

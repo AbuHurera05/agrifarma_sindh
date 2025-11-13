@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="admin-header">User Management</h1>
+            <p class="text-muted">Manage platform users, permissions, and access levels</p>
+        </div>
+        <div class="admin-actions">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fas fa-user-plus"></i> Add New User
+            </button>
+            <button class="btn btn-outline-info" id="exportUsers">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="row mb-4">
+        <div class="col-xl-2 col-md-4 mb-3">
+            <div class="admin-stat-card card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Users
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ users|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-3">
+            <div class="admin-stat-card card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Active Today
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">24</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-3">
+            <div class="admin-stat-card card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Consultants
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ users|selectattr('is_consultant')|list|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-3">
+            <div class="admin-stat-card card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Farmers
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ users|selectattr('profession', 'equalto', 'Farmer')|list|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tractor fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-3">
+            <div class="admin-stat-card card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Admins
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ users|selectattr('is_admin')|list|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-crown fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-3">
+            <div class="admin-stat-card card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                New This Week
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">8</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="user-search">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="userRoleFilter">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="consultant">Consultant</option>
+                        <option value="farmer">Farmer</option>
+                        <option value="student">Student</option>
+                        <option value="researcher">Researcher</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="userStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="userExpertiseFilter">
+                        <option value="">All Expertise</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success w-50" id="applyFilters">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-outline-secondary w-50" id="resetFilters">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-success">All Users ({{ users|length }} total)</h6>
+            <div class="export-actions">
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-csv"></i> CSV</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel"></i> Excel</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf"></i> PDF</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered admin-users-table" id="usersTable">
+                    <thead class="table-success">
+                        <tr>
+                            <th width="30">
+                                <input type="checkbox" class="form-check-input" id="selectAll">
+                            </th>
+                            <th width="250">User</th>
+                            <th width="120">Role</th>
+                            <th width="100">Expertise</th>
+                            <th width="150">Location</th>
+                            <th width="100">Status</th>
+                            <th width="120">Joined</th>
+                            <th width="120">Last Active</th>
+                            <th width="150">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="user-row" data-user-id="{{ user.id }}">
+                            <td>
+                                <input type="checkbox" class="form-check-input user-checkbox" value="{{ user.id }}">
+                            </td>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar-sm">
+                                        {% if user.profile_picture %}
+                                        <img src="{{ user.profile_picture }}" alt="{{ user.username }}"
+                                            class="user-avatar-img">
+                                        {% else %}
+                                        <div class="user-avatar-default-sm">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="d-flex align-items-center">
+                                            <strong class="me-2">{{ user.username }}</strong>
+                                            {% if user.is_admin %}
+                                            <i class="fas fa-crown text-warning" title="Administrator"></i>
+                                            {% endif %}
+                                        </div>
+                                        <small class="text-muted d-block">{{ user.email }}</small>
+                                        <small class="text-muted">{{ user.profession }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-roles">
+                                    {% if user.is_admin %}
+                                    <span class="badge bg-danger admin-badge">Admin</span>
+                                    {% endif %}
+                                    {% if user.is_consultant %}
+                                    <span class="badge bg-primary consultant-badge">Consultant</span>
+                                    {% endif %}
+                                    <span class="badge bg-secondary profession-badge">{{ user.profession }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="expertise-badge expertise-{{ user.expertise_level }}">
+                                    <i class="fas fa-star me-1"></i>{{ user.expertise_level|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="user-location">
+                                    <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                    {{ user.location|default('Not set', true) }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-active">
+                                    <i class="fas fa-circle me-1"></i>Active
+                                </span>
+                            </td>
+                            <td>
+                                <div class="user-date">
+                                    <div class="date-main">{{ user.created_at.strftime('%Y-%m-%d') }}</div>
+                                    <div class="date-sub">{{ user.created_at|time_ago }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-date">
+                                    <div class="date-main">2 hours ago</div>
+                                    <div class="date-sub">Recently active</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-actions">
+                                    <button class="btn btn-sm btn-outline-primary view-user"
+                                        data-user-id="{{ user.id }}" data-bs-toggle="tooltip" title="View Profile">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning edit-user"
+                                        data-user-id="{{ user.id }}" data-bs-toggle="tooltip" title="Edit User">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger suspend-user"
+                                        data-user-id="{{ user.id }}" data-bs-toggle="tooltip" title="Suspend User">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                    <div class="dropdown d-inline">
+                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown" title="More Actions">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item send-message" href="#"
+                                                    data-user-id="{{ user.id }}">
+                                                    <i class="fas fa-envelope"></i> Send Message
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item manage-roles" href="#"
+                                                    data-user-id="{{ user.id }}">
+                                                    <i class="fas fa-user-cog"></i> Manage Roles
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item view-activity" href="#"
+                                                    data-user-id="{{ user.id }}">
+                                                    <i class="fas fa-history"></i> Activity Log
+                                                </a>
+                                            </li>
+                                            {% if not user.is_admin %}
+                                            <li>
+                                                <a class="dropdown-item make-admin" href="#"
+                                                    data-user-id="{{ user.id }}">
+                                                    <i class="fas fa-crown"></i> Make Admin
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger delete-user" href="#"
+                                                    data-user-id="{{ user.id }}">
+                                                    <i class="fas fa-trash"></i> Delete User
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions mt-3 p-3 bg-light rounded d-none" id="bulkActions">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span id="selectedCount">0 users selected</span>
+                    <div class="bulk-buttons">
+                        <select class="form-select form-select-sm d-inline-block w-auto me-2" id="bulkAction">
+                            <option value="">Bulk Actions</option>
+                            <option value="activate">Activate Users</option>
+                            <option value="suspend">Suspend Users</option>
+                            <option value="export">Export Selected</option>
+                            <option value="message">Send Message</option>
+                            <option value="delete">Delete Users</option>
+                        </select>
+                        <button class="btn btn-sm btn-success" id="applyBulkAction">
+                            <i class="fas fa-play"></i> Apply
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="clearSelection">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="User pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Profession</label>
+                            <select class="form-select" required>
+                                <option value="">Select Profession</option>
+                                <option value="Farmer">Farmer</option>
+                                <option value="Agriculturist">Agriculturist</option>
+                                <option value="Researcher">Researcher</option>
+                                <option value="Student">Student</option>
+                                <option value="Consultant">Consultant</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Expertise Level</label>
+                            <select class="form-select" required>
+                                <option value="">Select Level</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Roles & Permissions</label>
+                        <div class="role-checkboxes">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="adminRole">
+                                <label class="form-check-label" for="adminRole">
+                                    <i class="fas fa-crown text-warning me-1"></i>Administrator
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="consultantRole">
+                                <label class="form-check-label" for="consultantRole">
+                                    <i class="fas fa-user-tie text-primary me-1"></i>Consultant
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="moderatorRole">
+                                <label class="form-check-label" for="moderatorRole">
+                                    <i class="fas fa-shield-alt text-info me-1"></i>Moderator
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="addUserForm" class="btn btn-success">Create User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Quick View Modal -->
+<div class="modal fade" id="userQuickView" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">User Profile</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userQuickViewContent">
+                <!-- Content will be loaded via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Bulk selection functionality
+        const selectAll = document.getElementById('selectAll');
+        const userCheckboxes = document.querySelectorAll('.user-checkbox');
+        const bulkActions = document.getElementById('bulkActions');
+        const selectedCount = document.getElementById('selectedCount');
+
+        selectAll.addEventListener('change', function () {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkActions();
+        });
+
+        userCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateBulkActions);
+        });
+
+        function updateBulkActions() {
+            const selectedCountValue = document.querySelectorAll('.user-checkbox:checked').length;
+            selectedCount.textContent = `${selectedCountValue} users selected`;
+
+            if (selectedCountValue > 0) {
+                bulkActions.classList.remove('d-none');
+            } else {
+                bulkActions.classList.add('d-none');
+            }
+        }
+
+        // Clear selection
+        document.getElementById('clearSelection').addEventListener('click', function () {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            selectAll.checked = false;
+            updateBulkActions();
+        });
+
+        // Apply bulk action
+        document.getElementById('applyBulkAction').addEventListener('click', function () {
+            const action = document.getElementById('bulkAction').value;
+            const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (!action) {
+                alert('Please select an action');
+                return;
+            }
+
+            if (selectedUsers.length === 0) {
+                alert('Please select at least one user');
+                return;
+            }
+
+            // Here you would typically make an API call
+            console.log(`Applying ${action} to users:`, selectedUsers);
+            alert(`Applying ${action} to ${selectedUsers.length} users`);
+        });
+
+        // User actions
+        document.querySelectorAll('.view-user').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.getAttribute('data-user-id');
+                // Load user data and show in modal
+                console.log('View user:', userId);
+                $('#userQuickView').modal('show');
+            });
+        });
+
+        // Search functionality
+        const userSearch = document.getElementById('userSearch');
+        userSearch.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.user-row').forEach(row => {
+                const username = row.querySelector('.user-details strong').textContent.toLowerCase();
+                const email = row.querySelector('.user-details .text-muted').textContent.toLowerCase();
+                if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

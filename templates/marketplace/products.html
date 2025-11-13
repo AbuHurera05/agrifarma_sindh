@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="marketplace-header">Agri Marketplace</h1>
+                    <p class="text-muted">Buy and sell agricultural products directly</p>
+                </div>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('create_product') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Sell Product
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Marketplace Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card marketplace-stat-card">
+                <div class="card-body text-center">
+                    <div class="marketplace-stat-number">{{ products|length }}</div>
+                    <div class="marketplace-stat-label">Total Products</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card marketplace-stat-card">
+                <div class="card-body text-center">
+                    <div class="marketplace-stat-number">24</div>
+                    <div class="marketplace-stat-label">Active Sellers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card marketplace-stat-card">
+                <div class="card-body text-center">
+                    <div class="marketplace-stat-number">156</div>
+                    <div class="marketplace-stat-label">Orders Completed</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card marketplace-stat-card">
+                <div class="card-body text-center">
+                    <div class="marketplace-stat-number">4.8</div>
+                    <div class="marketplace-stat-label">Average Rating</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <div class="marketplace-search">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" placeholder="Search products..." id="productSearch">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="Crops">Crops</option>
+                        <option value="Seeds">Seeds</option>
+                        <option value="Fertilizers">Fertilizers</option>
+                        <option value="Tools">Tools</option>
+                        <option value="Livestock">Livestock</option>
+                        <option value="Organic">Organic Products</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="priceFilter">
+                        <option value="">Any Price</option>
+                        <option value="0-1000">Under Rs. 1,000</option>
+                        <option value="1000-5000">Rs. 1,000 - 5,000</option>
+                        <option value="5000-10000">Rs. 5,000 - 10,000</option>
+                        <option value="10000+">Over Rs. 10,000</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="sortFilter">
+                        <option value="newest">Newest First</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+            <div class="row" id="productsGrid">
+                {% for product in products %}
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="card product-card">
+                        <div class="product-image-container">
+                            {% if product.image_url %}
+                            <img src="{{ product.image_url }}" class="product-card-image" alt="{{ product.name }}">
+                            {% else %}
+                            <div class="product-card-image-placeholder">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            {% endif %}
+                            <div class="product-badges">
+                                {% if product.stock_quantity > 0 %}
+                                <span class="badge bg-success">In Stock</span>
+                                {% else %}
+                                <span class="badge bg-danger">Out of Stock</span>
+                                {% endif %}
+                                {% if product.created_at and product.created_at|is_new %}
+                                <span class="badge bg-warning">New</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="product-category mb-2">
+                                <span class="badge bg-light text-dark">{{ product.category }}</span>
+                            </div>
+                            <h5 class="product-title">
+                                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none">
+                                    {{ product.name }}
+                                </a>
+                            </h5>
+                            <p class="product-description text-muted">
+                                {{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}
+                            </p>
+                            <div class="product-meta mb-3">
+                                <div class="product-seller">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user"></i> 
+                                        {% if product.seller %}
+                                            {{ product.seller.username }}
+                                        {% else %}
+                                            Unknown Seller
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="product-stock">
+                                    <small class="text-muted">
+                                        <i class="fas fa-box"></i> {{ product.stock_quantity }} available
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="product-footer d-flex justify-content-between align-items-center">
+                                <div class="product-price">
+                                    <span class="price-amount">Rs. {{ "%.2f"|format(product.price) }}</span>
+                                    {% if product.stock_quantity > 0 %}
+                                    <small class="text-muted d-block">per unit</small>
+                                    {% endif %}
+                                </div>
+                                <div class="product-actions">
+                                    {% if product.stock_quantity > 0 %}
+                                    <button class="btn btn-success btn-sm add-to-cart" data-product-id="{{ product.id }}">
+                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                                        Out of Stock
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-basket fa-3x text-muted mb-3"></i>
+                            <h3>No Products Available</h3>
+                            <p class="text-muted">Be the first to list your agricultural products!</p>
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('create_product') }}" class="btn btn-success mt-2">
+                                List Your First Product
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-success mt-2">
+                                Login to Sell
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if products %}
+            <nav aria-label="Products pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">Previous</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <!-- Categories Widget -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-tags"></i> Categories</h5>
+                </div>
+                <div class="card-body">
+                    <div class="marketplace-categories">
+                        <a href="#" class="category-item d-flex justify-content-between align-items-center">
+                            <span>All Products</span>
+                            <span class="badge bg-success rounded-pill">{{ products|length }}</span>
+                        </a>
+                        <a href="#" class="category-item d-flex justify-content-between align-items-center">
+                            <span>Crops</span>
+                            <span class="badge bg-light text-dark rounded-pill">
+                                {{ products|selectattr('category', 'equalto', 'Crops')|list|length }}
+                            </span>
+                        </a>
+                        <a href="#" class="category-item d-flex justify-content-between align-items-center">
+                            <span>Seeds</span>
+                            <span class="badge bg-light text-dark rounded-pill">
+                                {{ products|selectattr('category', 'equalto', 'Seeds')|list|length }}
+                            </span>
+                        </a>
+                        <a href="#" class="category-item d-flex justify-content-between align-items-center">
+                            <span>Fertilizers</span>
+                            <span class="badge bg-light text-dark rounded-pill">
+                                {{ products|selectattr('category', 'equalto', 'Fertilizers')|list|length }}
+                            </span>
+                        </a>
+                        <a href="#" class="category-item d-flex justify-content-between align-items-center">
+                            <span>Tools</span>
+                            <span class="badge bg-light text-dark rounded-pill">
+                                {{ products|selectattr('category', 'equalto', 'Tools')|list|length }}
+                            </span>
+                        </a>
+                        <a href="#" class="category-item d-flex justify-content-between align-items-center">
+                            <span>Livestock</span>
+                            <span class="badge bg-light text-dark rounded-pill">
+                                {{ products|selectattr('category', 'equalto', 'Livestock')|list|length }}
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Sellers -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Featured Sellers</h5>
+                </div>
+                <div class="card-body">
+                    <div class="featured-sellers">
+                        {% for product in products[:3] %}
+                        <div class="seller-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="seller-avatar me-3">
+                                    {% if product.seller and product.seller.profile_picture %}
+                                    <img src="{{ product.seller.profile_picture }}" alt="{{ product.seller.username }}" 
+                                         class="seller-avatar-img rounded-circle">
+                                    {% else %}
+                                    <div class="seller-avatar-default rounded-circle">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="seller-info">
+                                    <h6 class="mb-1">
+                                        {% if product.seller %}
+                                            {{ product.seller.username }}
+                                        {% else %}
+                                            Unknown Seller
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i> 
+                                        {% if product.seller and product.seller.location %}
+                                            {{ product.seller.location }}
+                                        {% else %}
+                                            Location not set
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            {% if not loop.last %}
+                            <hr class="my-2">
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Range -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-filter"></i> Price Range</h5>
+                </div>
+                <div class="card-body">
+                    <div class="price-range">
+                        <input type="range" class="form-range" min="0" max="50000" step="1000" id="priceRange">
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">Rs. 0</small>
+                            <small class="text-muted">Rs. 50,000</small>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted" id="selectedPrice">Selected: Rs. 0 - Rs. 50,000</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Price range display
+    const priceRange = document.getElementById('priceRange');
+    const selectedPrice = document.getElementById('selectedPrice');
+    
+    priceRange.addEventListener('input', function() {
+        const value = parseInt(this.value);
+        selectedPrice.textContent = `Selected: Rs. 0 - Rs. ${value.toLocaleString()}`;
+    });
+
+    // Add to cart functionality
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            alert('Product added to cart!');
+        });
+    });
+});
+</script>
+{% endblock %}

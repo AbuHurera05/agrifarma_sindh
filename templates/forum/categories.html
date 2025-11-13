@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="forum-header">Discussion Forum</h1>
+                    <p class="text-muted">Connect with fellow farmers and share knowledge</p>
+                </div>
+                <div class="forum-actions">
+                    <a href="#" class="btn btn-success">
+                        <i class="fas fa-plus"></i> New Thread
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forum Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card forum-stat-card">
+                <div class="card-body text-center">
+                    <div class="forum-stat-number">{{ categories|length }}</div>
+                    <div class="forum-stat-label">Categories</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card forum-stat-card">
+                <div class="card-body text-center">
+                    <div class="forum-stat-number">
+                        {{ categories|map(attribute='threads')|map('length')|sum }}
+                    </div>
+                    <div class="forum-stat-label">Total Threads</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card forum-stat-card">
+                <div class="card-body text-center">
+                    <div class="forum-stat-number">1,248</div>
+                    <div class="forum-stat-label">Total Posts</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card forum-stat-card">
+                <div class="card-body text-center">
+                    <div class="forum-stat-number">456</div>
+                    <div class="forum-stat-label">Active Members</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="forum-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search discussions...">
+                            <button class="btn btn-success" type="button">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="forum-filters">
+                        <select class="form-select">
+                            <option>All Categories</option>
+                            <option>Recent Activity</option>
+                            <option>Most Popular</option>
+                            <option>Unanswered</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forum Categories -->
+    <div class="forum-categories">
+        {% for category in categories %}
+        <div class="card forum-category-card mb-4">
+            <div class="card-header forum-category-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">
+                            <i class="fas fa-folder me-2"></i>{{ category.name }}
+                        </h5>
+                        <p class="mb-0 text-muted">{{ category.description }}</p>
+                    </div>
+                    <div class="forum-category-stats">
+                        <span class="badge bg-success">{{ category.threads|length }} Threads</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if category.threads %}
+                <div class="forum-recent-threads">
+                    <h6 class="mb-3">Recent Threads</h6>
+                    {% for thread in category.threads[-3:]|reverse %}
+                    <div class="forum-thread-preview">
+                        <div class="thread-main">
+                            <h6 class="thread-title">
+                                <a href="{{ url_for('forum_thread', thread_id=thread.id) }}" class="text-decoration-none">
+                                    {{ thread.title }}
+                                </a>
+                            </h6>
+                            <div class="thread-meta">
+                                <small class="text-muted">
+                                    By {{ thread.author.username }} • {{ thread.created_at|time_ago }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="thread-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-comment"></i> {{ thread.posts|length }}
+                            </small>
+                        </div>
+                    </div>
+                    {% if not loop.last %}
+                    <hr class="my-2">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-comments fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">No threads yet. Be the first to start a discussion!</p>
+                </div>
+                {% endif %}
+                
+                <div class="forum-category-actions mt-3">
+                    <a href="{{ url_for('forum_category', category_id=category.id) }}" class="btn btn-outline-success btn-sm">
+                        View All Threads
+                    </a>
+                    {% if current_user.is_authenticated %}
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#newThreadModal" data-category="{{ category.id }}">
+                        <i class="fas fa-plus"></i> New Thread
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Popular Tags -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-tags"></i> Popular Tags</h5>
+        </div>
+        <div class="card-body">
+            <div class="forum-tags">
+                <span class="forum-tag">Wheat</span>
+                <span class="forum-tag">Irrigation</span>
+                <span class="forum-tag">Soil Health</span>
+                <span class="forum-tag">Pest Control</span>
+                <span class="forum-tag">Organic Farming</span>
+                <span class="forum-tag">Crop Rotation</span>
+                <span class="forum-tag">Water Management</span>
+                <span class="forum-tag">Fertilizers</span>
+                <span class="forum-tag">Livestock</span>
+                <span class="forum-tag">Market Prices</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Thread Modal -->
+<div class="modal fade" id="newThreadModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Start New Discussion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newThreadForm">
+                    <div class="mb-3">
+                        <label for="threadTitle" class="form-label">Thread Title</label>
+                        <input type="text" class="form-control" id="threadTitle" placeholder="Enter a clear and descriptive title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="threadCategory" class="form-label">Category</label>
+                        <select class="form-select" id="threadCategory" required>
+                            <option value="">Select Category</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="threadContent" class="form-label">Your Message</label>
+                        <textarea class="form-control" id="threadContent" rows="6" placeholder="Describe your question or topic in detail..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tags (optional)</label>
+                        <input type="text" class="form-control" placeholder="Add relevant tags separated by commas">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="newThreadForm" class="btn btn-success">Create Thread</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set category when new thread button is clicked
+    var newThreadModal = document.getElementById('newThreadModal');
+    newThreadModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var categoryId = button.getAttribute('data-category');
+        if (categoryId) {
+            document.getElementById('threadCategory').value = categoryId;
+        }
+    });
+});
+</script>
+{% endblock %}

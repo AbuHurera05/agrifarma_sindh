@@ -1,0 +1,165 @@
+<!-- templates/forum/threads.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum') }}">Forum</a></li>
+            <li class="breadcrumb-item active">{{ category.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="forum-header">{{ category.name }}</h1>
+                    <p class="text-muted">{{ category.description }}</p>
+                </div>
+                {% if current_user.is_authenticated %}
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newThreadModal">
+                    <i class="fas fa-plus"></i> New Thread
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Threads List -->
+    <div class="card">
+        <div class="card-header forum-threads-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0">Threads</h5>
+                </div>
+                <div class="col-md-2 text-center">
+                    <small class="text-muted">Replies</small>
+                </div>
+                <div class="col-md-2 text-center">
+                    <small class="text-muted">Views</small>
+                </div>
+                <div class="col-md-2">
+                    <small class="text-muted">Last Post</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if threads %}
+            <div class="forum-threads-list">
+                {% for thread in threads %}
+                <div class="forum-thread-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="thread-content">
+                                <h6 class="thread-title">
+                                    <a href="{{ url_for('forum_thread', thread_id=thread.id) }}"
+                                        class="text-decoration-none">
+                                        {{ thread.title }}
+                                    </a>
+                                </h6>
+                                <div class="thread-meta">
+                                    <small class="text-muted">
+                                        By <strong>{{ thread.author.username if thread.author else 'Unknown User'
+                                            }}</strong> • {{ thread.created_at|time_ago }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="thread-stat">{{ thread.posts|length if thread.posts else 0 }}</span>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="thread-stat">0</span>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="thread-last-post">
+                                {% if thread.posts and thread.posts|length > 0 %}
+                                {% set last_post = thread.posts[-1] %}
+                                <small class="text-muted">
+                                    By {{ last_post.author.username if last_post.author else 'Unknown User' }}<br>
+                                    {{ last_post.created_at|time_ago }}
+                                </small>
+                                {% else %}
+                                <small class="text-muted">No posts</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if not loop.last %}
+                <hr class="my-0">
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h4>No Threads Yet</h4>
+                    <p class="text-muted">Be the first to start a discussion in this category!</p>
+                    {% if current_user.is_authenticated %}
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newThreadModal">
+                        Start First Thread
+                    </button>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-success">Login to Post</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if threads and threads|length > 10 %}
+    <nav aria-label="Threads pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- New Thread Modal -->
+<!-- In the New Thread Modal section of forum/threads.html -->
+<div class="modal fade" id="newThreadModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">New Thread in {{ category.name }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('create_thread', category_id=category.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="threadTitle" class="form-label">Thread Title *</label>
+                        <input type="text" class="form-control" id="threadTitle" name="title"
+                            placeholder="Enter a clear and descriptive title" required maxlength="200">
+                        <div class="form-text">Title is required and cannot be empty.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="threadContent" class="form-label">Your Message *</label>
+                        <textarea class="form-control" id="threadContent" name="content" rows="6"
+                            placeholder="Describe your question or topic in detail..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Create Thread</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

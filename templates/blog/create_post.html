@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit"></i> Write New Article</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Article Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" 
+                                           placeholder="Enter a compelling title for your article" required>
+                                    <div class="form-text">Make it descriptive and engaging</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Success Stories">Success Stories</option>
+                                        <option value="Farming Techniques">Farming Techniques</option>
+                                        <option value="Weather Tips">Weather Tips</option>
+                                        <option value="Crop Management">Crop Management</option>
+                                        <option value="Soil Health">Soil Health</option>
+                                        <option value="Irrigation Methods">Irrigation Methods</option>
+                                        <option value="Pest Control">Pest Control</option>
+                                        <option value="Organic Farming">Organic Farming</option>
+                                        <option value="Market Insights">Market Insights</option>
+                                        <option value="Technology in Agriculture">Technology in Agriculture</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="featured_image" class="form-label">Featured Image</label>
+                            <input type="file" class="form-control" id="featured_image" name="featured_image" 
+                                   accept="image/*">
+                            <div class="form-text">Upload a high-quality image that represents your article (optional)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Article Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="15" 
+                                      placeholder="Share your knowledge, experiences, and insights with the farming community. Be detailed and helpful..." required></textarea>
+                            <div class="form-text">
+                                <i class="fas fa-lightbulb"></i> Tip: Use clear headings, bullet points, and practical examples
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Writing Tips</label>
+                            <div class="writing-tips">
+                                <div class="tip-item">
+                                    <i class="fas fa-check text-success"></i>
+                                    <span>Start with an engaging introduction</span>
+                                </div>
+                                <div class="tip-item">
+                                    <i class="fas fa-check text-success"></i>
+                                    <span>Use clear headings and subheadings</span>
+                                </div>
+                                <div class="tip-item">
+                                    <i class="fas fa-check text-success"></i>
+                                    <span>Include practical examples from your experience</span>
+                                </div>
+                                <div class="tip-item">
+                                    <i class="fas fa-check text-success"></i>
+                                    <span>Add photos if possible to illustrate your points</span>
+                                </div>
+                                <div class="tip-item">
+                                    <i class="fas fa-check text-success"></i>
+                                    <span>End with a helpful conclusion or call to action</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('blog') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane"></i> Publish Article
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-eye"></i> Article Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="article-preview">
+                        <p class="text-muted">Your article preview will appear here as you type...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple preview functionality
+document.getElementById('content').addEventListener('input', function() {
+    const preview = document.querySelector('.article-preview');
+    preview.innerHTML = this.value.replace(/\n/g, '<br>');
+});
+</script>
+{% endblock %}

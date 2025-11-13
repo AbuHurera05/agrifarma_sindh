@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="admin-header">Admin Dashboard</h1>
+            <p class="text-muted">Manage your AgriFarma platform</p>
+        </div>
+        <div class="admin-quick-actions">
+            <button class="btn btn-success">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stat-card card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Users
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_users }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stat-card card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Products
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_products }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stat-card card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Blog Posts
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_posts }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-blog fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stat-card card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Forum Threads
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_threads }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Recent Activity -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-success">Recent Activity</h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" 
+                                data-bs-toggle="dropdown">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Activities</a></li>
+                            <li><a class="dropdown-item" href="#">User Registrations</a></li>
+                            <li><a class="dropdown-item" href="#">Content Creation</a></li>
+                            <li><a class="dropdown-item" href="#">Marketplace</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="admin-activity-list">
+                        <div class="activity-item admin-activity">
+                            <div class="activity-icon bg-success">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6>New User Registration</h6>
+                                <p class="mb-1">Ali Ahmed registered as a new farmer</p>
+                                <small class="text-muted">2 minutes ago</small>
+                            </div>
+                        </div>
+
+                        <div class="activity-item admin-activity">
+                            <div class="activity-icon bg-info">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6>New Product Listed</h6>
+                                <p class="mb-1">Organic Wheat added to marketplace</p>
+                                <small class="text-muted">15 minutes ago</small>
+                            </div>
+                        </div>
+
+                        <div class="activity-item admin-activity">
+                            <div class="activity-icon bg-warning">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6>Blog Post Created</h6>
+                                <p class="mb-1">New article about soil health published</p>
+                                <small class="text-muted">1 hour ago</small>
+                            </div>
+                        </div>
+
+                        <div class="activity-item admin-activity">
+                            <div class="activity-icon bg-primary">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6>Forum Thread Started</h6>
+                                <p class="mb-1">New discussion about irrigation methods</p>
+                                <small class="text-muted">2 hours ago</small>
+                            </div>
+                        </div>
+
+                        <div class="activity-item admin-activity">
+                            <div class="activity-icon bg-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6>Reported Content</h6>
+                                <p class="mb-1">A forum post was reported by users</p>
+                                <small class="text-muted">3 hours ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="fas fa-cog"></i> Platform Management</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="admin-quick-links">
+                                <a href="{{ url_for('manage_users') }}" class="quick-link-item">
+                                    <i class="fas fa-users-cog"></i>
+                                    <span>Manage Users</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="#" class="quick-link-item">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Content Moderation</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="#" class="quick-link-item">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span>Marketplace Orders</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="#" class="quick-link-item">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <span>Analytics & Reports</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-tools"></i> System Tools</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="admin-system-tools">
+                                <button class="system-tool-btn">
+                                    <i class="fas fa-database"></i>
+                                    <span>Database Backup</span>
+                                </button>
+                                <button class="system-tool-btn">
+                                    <i class="fas fa-broom"></i>
+                                    <span>Cache Clear</span>
+                                </button>
+                                <button class="system-tool-btn">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Bulk Email</span>
+                                </button>
+                                <button class="system-tool-btn">
+                                    <i class="fas fa-file-export"></i>
+                                    <span>Export Data</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Pending Approvals -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Pending Approvals</h6>
+                </div>
+                <div class="card-body">
+                    <div class="pending-approvals">
+                        <div class="approval-item">
+                            <div class="approval-content">
+                                <h6>Consultant Application</h6>
+                                <p class="mb-1">Dr. Sarah Khan - Soil Science Expert</p>
+                                <small class="text-muted">Applied 2 days ago</small>
+                            </div>
+                            <div class="approval-actions">
+                                <button class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="approval-item">
+                            <div class="approval-content">
+                                <h6>Product Listing</h6>
+                                <p class="mb-1">Organic Fertilizer - Needs verification</p>
+                                <small class="text-muted">Submitted 1 day ago</small>
+                            </div>
+                            <div class="approval-actions">
+                                <button class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="approval-item">
+                            <div class="approval-content">
+                                <h6>Blog Post</h6>
+                                <p class="mb-1">"Modern Irrigation Techniques" - Review needed</p>
+                                <small class="text-muted">Posted 5 hours ago</small>
+                            </div>
+                            <div class="approval-actions">
+                                <button class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="#" class="btn btn-outline-warning btn-sm">View All Pending</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">System Health</h6>
+                </div>
+                <div class="card-body">
+                    <div class="system-health">
+                        <div class="health-item">
+                            <div class="health-label">Server Load</div>
+                            <div class="health-value">
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" style="width: 45%"></div>
+                                </div>
+                                <span>45%</span>
+                            </div>
+                        </div>
+
+                        <div class="health-item">
+                            <div class="health-label">Database</div>
+                            <div class="health-value">
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" style="width: 70%"></div>
+                                </div>
+                                <span>70%</span>
+                            </div>
+                        </div>
+
+                        <div class="health-item">
+                            <div class="health-label">Storage</div>
+                            <div class="health-value">
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" style="width: 85%"></div>
+                                </div>
+                                <span>85%</span>
+                            </div>
+                        </div>
+
+                        <div class="health-item">
+                            <div class="health-label">Uptime</div>
+                            <div class="health-value">
+                                <span class="text-success">99.9%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Registrations -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Recent Registrations</h6>
+                </div>
+                <div class="card-body">
+                    <div class="recent-users">
+                        <div class="user-item">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-info">
+                                <h6>Muhammad Ali</h6>
+                                <small class="text-muted">Farmer • Registered today</small>
+                            </div>
+                        </div>
+
+                        <div class="user-item">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="user-info">
+                                <h6>Dr. Aisha Khan</h6>
+                                <small class="text-muted">Consultant • 1 day ago</small>
+                            </div>
+                        </div>
+
+                        <div class="user-item">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="user-info">
+                                <h6>Bilal Ahmed</h6>
+                                <small class="text-muted">Student • 2 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
